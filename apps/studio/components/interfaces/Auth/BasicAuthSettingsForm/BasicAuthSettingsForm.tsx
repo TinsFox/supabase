@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import {
@@ -15,7 +16,6 @@ import {
   Radio,
   Toggle,
 } from 'ui'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
@@ -28,9 +28,9 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore, useSelectedOrganization } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
@@ -89,8 +89,8 @@ const BasicAuthSettingsForm = observer(() => {
     SECURITY_CAPTCHA_ENABLED: authConfig?.SECURITY_CAPTCHA_ENABLED || false,
     SECURITY_CAPTCHA_SECRET: authConfig?.SECURITY_CAPTCHA_SECRET || '',
     SECURITY_CAPTCHA_PROVIDER: authConfig?.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
-    SESSIONS_TIMEBOX: authConfig?.SESSIONS_TIMEBOX || 0,
-    SESSIONS_INACTIVITY_TIMEOUT: authConfig?.SESSIONS_INACTIVITY_TIMEOUT || 0,
+    SESSIONS_TIMEBOX: (authConfig as any)?.SESSIONS_TIMEBOX || 0,
+    SESSIONS_INACTIVITY_TIMEOUT: (authConfig as any)?.SESSIONS_INACTIVITY_TIMEOUT || 0,
   }
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -183,8 +183,8 @@ const BasicAuthSettingsForm = observer(() => {
                     <UpgradeToPro
                       primaryText="Upgrade to Pro"
                       secondaryText="Configuring user sessions requires the Pro plan."
-                      projectRef={projectRef}
-                      organizationSlug={organization.slug}
+                      projectRef={projectRef!}
+                      organizationSlug={organization!.slug}
                     />
                   )}
                   <InputNumber
