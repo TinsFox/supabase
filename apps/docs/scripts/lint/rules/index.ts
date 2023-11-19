@@ -4,7 +4,11 @@ interface LintSuccess {
   success: true
 }
 
-export type ErrorSeverity = 'suggestion' | 'warning' | 'error'
+export enum ErrorSeverity {
+  Error = 1,
+  Warning,
+  Suggestion,
+}
 
 interface LintError {
   error: true
@@ -25,7 +29,7 @@ export function success(): LintSuccess {
 export function error(message: string, severity?: ErrorSeverity): LintError {
   return {
     error: true,
-    severity: severity ?? 'warning',
+    severity: severity ?? ErrorSeverity.Warning,
     message,
   }
 }

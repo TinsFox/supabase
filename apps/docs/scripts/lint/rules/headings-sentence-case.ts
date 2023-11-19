@@ -3,19 +3,19 @@ import { stripSymbols } from '../utils/words'
 import { capitalizedWords } from '../config/words'
 import { ErrorSeverity, LintRule, error, success } from '.'
 
-export function headingsSentenceCaseCheck(node: Content) {
+function headingsSentenceCaseCheck(node: Content) {
   if (!('children' in node)) {
     return success()
   }
 
-  let text = (node.children.find((child) => child.type === 'text') as Text).value
-
-  if (!text) {
+  const textNode = node.children.find((child) => child.type === 'text') as Text
+  if (!textNode) {
     return success()
   }
+  const text = textNode.value
 
-  let errorLevel: ErrorSeverity | null = null
-  let errorMessage: string | null = null
+  let errorLevel: ErrorSeverity[] = []
+  let errorMessage: string[] = []
 
   const words = text.split(/s+/)
 
@@ -27,23 +27,25 @@ export function headingsSentenceCaseCheck(node: Content) {
 
     if (i === 0) {
       if (/[a-z]/.test(word[0])) {
-        errorLevel = 'error'
-        errorMessage = 'First word in heading should be capitalized.'
+        errorLevel.push(ErrorSeverity.Error)
+        errorMessage.push('First word in heading should be capitalized.')
       }
       continue
     }
 
     if (/[A-Z]/.test(word[0]) && !capitalizedWords.has(word)) {
-      errorLevel = 'error'
-      errorMessage = 'Heading should be in sentence case.'
+      errorLevel.push(ErrorSeverity.Error)
+      errorMessage.push('Heading should be in sentence case.')
       break
     }
   }
 
-  return errorLevel ? error(errorMessage, errorLevel) : success()
+  return errorLevel.length ? error(errorMessage.join(' '), Math.min(...errorLevel)) : success()
 }
 
-export const headingSentenceCase = new LintRule({
-  check: headingsSentenceCaseCheck,
-  nodeTypes: 'heading',
-})
+export function headingsSentenceCase() {
+  return new LintRule({
+    check: headingsSentenceCaseCheck,
+    nodeTypes: 'heading',
+  })
+}
