@@ -177,9 +177,7 @@ const BasicAuthSettingsForm = observer(() => {
               <div className="border-t border-muted"></div>
               <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
-                  {isProPlanAndUp ? (
-                    <></>
-                  ) : (
+                  {!isProPlanAndUp && (
                     <UpgradeToPro
                       primaryText="Upgrade to Pro"
                       secondaryText="Configuring user sessions requires the Pro plan."
